@@ -13,11 +13,7 @@ jobs:
       contents: write
       issues: write
     steps:
-      # Only needed because the action under test is local to this repo
-      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
-        with:
-          persist-credentials: false
-      - uses: ./create-release
+      - uses: UoMResearchIT/Actions/create-release@Josh-Woodcock/create-release
         id: release
         with:
           version-file: MyApp/appsettings.json
