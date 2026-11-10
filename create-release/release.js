@@ -212,7 +212,15 @@ async function main({ github, context, core }) {
     if (milestoneTitle) {
         milestone = await findMilestone(github, owner, repo, milestoneTitle);
         if (!milestone) {
-            core.warning(`There is no open milestone called ${milestoneTitle}.`);
+            // Before merging, a missing milestone (e.g. a misspelt one) can
+            // still be fixed, so warn. After merging it can't, and releases
+            // such as hotfixes often have no milestone, so just log it.
+            const message = `There is no open milestone called ${milestoneTitle}.`;
+            if (mode === "check") {
+                core.warning(message);
+            } else {
+                core.info(message);
+            }
         } else {
             openItems = milestone.open_issues;
             // The release PR itself may be in the milestone; it does not count.

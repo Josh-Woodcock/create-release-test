@@ -34,7 +34,7 @@ Any runner will do, and the repository does not need to be checked out: the vers
 2. Finds the earlier releases: the existing tags of the form given by `tag`. Those that do not hold a version are ignored.
 3. If the tag already exists, stops: in `release` mode it succeeds without releasing (or fails, with `if-exists: fail`); in `check` mode it fails.
 4. Fails if the version is not newer than the latest release, unless `require-increase` is `false`.
-5. Warns if the `milestone` is missing or still has open issues or pull requests. On a pull request, the pull request itself does not count.
+5. Warns if the `milestone` still has open issues or pull requests. On a pull request, the pull request itself does not count. A missing milestone is only warned about in `check` mode, when it can still be fixed before merging; in `release` mode it is just logged, as releases such as hotfixes often have no milestone.
 6. In `check` mode, stops here.
 7. Generates release notes from the previous release, i.e. the newest earlier release with a lower version, and creates the release and its tag on the target commit.
 8. Closes the milestone, if it has no open issues or pull requests left.
