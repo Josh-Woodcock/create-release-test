@@ -12,6 +12,9 @@ jobs:
     permissions:
       contents: write
       issues: write
+    outputs:
+      created: ${{ steps.release.outputs.created }}
+      tag: ${{ steps.release.outputs.tag }}
     steps:
       - uses: UoMResearchIT/Actions/create-release@Josh-Woodcock/create-release
         id: release
@@ -21,10 +24,22 @@ jobs:
           tag: Release_v{version}
           title: v{version}
           milestone: v{version}
-      - run: echo "version=$V tag=$T previous=$P created=$C url=$U"
+
+  deploy:
+    needs: release
+    if: needs.release.outputs.created == 'true'
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          ref: ${{ needs.release.outputs.tag }}
+          persist-credentials: false
+      - name: Pretend to deploy
+        run: |
+          echo "Deploying $TAG"
+          echo "Checked-out commit: $(git rev-parse HEAD)"
+          grep VersionNumber MyApp/appsettings.json
         env:
-          V: ${{ steps.release.outputs.version }}
-          T: ${{ steps.release.outputs.tag }}
-          P: ${{ steps.release.outputs.previous-tag }}
-          C: ${{ steps.release.outputs.created }}
-          U: ${{ steps.release.outputs.release-url }}
+          TAG: ${{ needs.release.outputs.tag }}
