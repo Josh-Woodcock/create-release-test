@@ -1,0 +1,30 @@
+name: Check release
+on:
+  pull_request:
+    branches: [release]
+permissions: {}
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      issues: read
+    steps:
+      # Only needed because the action under test is local to this repo
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - uses: ./create-release
+        id: release
+        with:
+          mode: check
+          version-file: MyApp/appsettings.json
+          version-pattern: '"VersionNumber"\s*:\s*"([^"]+)"'
+          tag: Release_v{version}
+          milestone: v{version}
+      - run: echo "version=$V tag=$T previous=$P created=$C"
+        env:
+          V: ${{ steps.release.outputs.version }}
+          T: ${{ steps.release.outputs.tag }}
+          P: ${{ steps.release.outputs.previous-tag }}
+          C: ${{ steps.release.outputs.created }}
